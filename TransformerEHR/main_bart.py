@@ -28,12 +28,12 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from trainer import Trainer
+from TransformerEHR.trainer import Trainer
 
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
 
 from dataset import DataCollatorForICDBERT, DataCollatorForICDBERTFINALPRED, DataCollatorForICDBART, prepare_dataset
-from icdmodelbart import ICDBartForPreTraining
+from TransformerEHR.icdmodelbart import ICDBartForPreTraining
 
 
 logger = logging.getLogger(__name__)
