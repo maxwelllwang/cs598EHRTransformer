@@ -20,6 +20,8 @@ from torch.utils.data.sampler import RandomSampler, Sampler, SequentialSampler
 from tqdm.auto import tqdm, trange
 
 from transformers.data.data_collator import DataCollator
+from transformers import DefaultDataCollator
+
 from transformers.modeling_utils import PreTrainedModel
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR, EvalPrediction, PredictionOutput, TrainOutput
@@ -257,8 +259,8 @@ class Trainer:
         self.optimizers = optimizers
         if tb_writer is not None:
             self.tb_writer = tb_writer
-        elif is_tensorboard_available() and self.is_world_master():
-            self.tb_writer = SummaryWriter(log_dir=self.args.logging_dir)
+        # elif is_tensorboard_available() and self.is_world_master():
+        #     self.tb_writer = SummaryWriter(log_dir=self.args.logging_dir)
         if not is_tensorboard_available():
             logger.warning(
                 "You are instantiating a Trainer but Tensorboard is not installed. You should consider installing it."
@@ -674,7 +676,9 @@ class Trainer:
         if is_tpu_available():
             return xm.is_master_ordinal(local=False)
         else:
-            return self.args.local_rank == -1 or torch.distributed.get_rank() == 0
+            # return self.args.local_rank == -1 or torch.distributed.get_rank() == 0
+            print("world master -- one process only")
+            return True
 
     def save_model(self, output_dir: Optional[str] = None):
         """

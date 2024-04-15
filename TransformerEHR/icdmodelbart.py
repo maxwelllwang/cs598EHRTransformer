@@ -187,7 +187,7 @@ class EncoderLayer(nn.Module):
         self.self_attn = SelfAttention(
             self.embed_dim, config.encoder_attention_heads, dropout=config.attention_dropout,
         )
-        self.normalize_before = config.normalize_before
+        self.normalize_before = True # config.normalize_before
         self.self_attn_layer_norm = LayerNorm(self.embed_dim)
         self.dropout = config.dropout
         self.activation_fn = ACT2FN[config.activation_function]
@@ -256,7 +256,7 @@ class BartEncoder(nn.Module):
 
         self.embed_tokens = embed_tokens
         # config.static_position_embeddings
-        if True:
+        if False:
             self.embed_positions = SinusoidalPositionalEmbedding(
                 config.max_position_embeddings, embed_dim, self.padding_idx
             )
@@ -264,14 +264,19 @@ class BartEncoder(nn.Module):
             self.embed_positions = LearnedPositionalEmbedding(
                 config.max_position_embeddings, embed_dim, self.padding_idx,
             )
-        if config.date_visit_embeddings:
+        # config.date_visit_embeddings
+        if False:
             self.embed_visitids = DateYearMonthDayEmbedding(config.max_position_embeddings, embed_dim, self.padding_idx)
         else:
             self.embed_visitids = nn.Embedding(1460, embed_dim) 
         self.layers = nn.ModuleList([EncoderLayer(config) for _ in range(config.encoder_layers)])
-        self.layernorm_embedding = LayerNorm(embed_dim) if config.normalize_embedding else nn.Identity()
+        #self.layernorm_embedding = LayerNorm(embed_dim) if config.normalize_embedding else nn.Identity()
+        self.layernorm_embedding = LayerNorm(embed_dim)
+
         # mbart has one extra layer_norm
-        self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None
+        # self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None
+        self.layer_norm = LayerNorm(config.d_model)
+
 
     def forward(
         self, input_ids, attention_mask=None, visit_ids=None
@@ -342,7 +347,7 @@ class DecoderLayer(nn.Module):
         self.dropout = config.dropout
         self.activation_fn = ACT2FN[config.activation_function]
         self.activation_dropout = config.activation_dropout
-        self.normalize_before = config.normalize_before
+        self.normalize_before = True # config.normalize_before
 
         self.self_attn_layer_norm = LayerNorm(self.embed_dim)
         self.encoder_attn = SelfAttention(
@@ -440,7 +445,7 @@ class BartDecoder(nn.Module):
         self.embed_scale = math.sqrt(config.d_model) if config.scale_embedding else 1.0
         self.embed_tokens = embed_tokens
         #config.static_position_embeddings
-        if True:
+        if False:
             self.embed_positions = SinusoidalPositionalEmbedding(
                 config.max_position_embeddings, config.d_model, config.pad_token_id
             )
@@ -451,8 +456,18 @@ class BartDecoder(nn.Module):
         self.layers = nn.ModuleList(
             [DecoderLayer(config) for _ in range(config.decoder_layers)]
         )  # type: List[DecoderLayer]
-        self.layernorm_embedding = LayerNorm(config.d_model) if config.normalize_embedding else nn.Identity()
-        self.layer_norm = LayerNorm(config.d_model) if config.add_final_layer_norm else None
+        # self.layernorm_embedding = LayerNorm(config.d_model) if config.normalize_embedding else nn.Identity()
+        # self.layer_norm = LayerNorm(config.d_model) if config.add_final_layer_norm else None
+
+        self.layernorm_embedding = LayerNorm(config.d_model)
+        print("self.layernorm_embedding = LayerNorm(config.d_model) if config.normalize_embedding else nn.Identity()")
+
+
+        # self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None
+        self.layer_norm = LayerNorm(config.d_model)
+        print("self.layer_norm = LayerNorm(config.d_model) if config.normalize_before else None")
+
+
 
     def forward(
         self,

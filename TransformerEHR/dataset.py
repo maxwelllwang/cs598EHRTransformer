@@ -44,9 +44,9 @@ def prepare_dataset(model_args, data_args, training_args, tokenizer):
     # eval_data = load_data(data_args.eval_data_file)
     # test_data = load_data(data_args.test_data_file)
 
-    train_data = None
-    eval_data = None
-    test_data = None
+    train_dataset = None
+    eval_dataset = None
+    test_datasets = None
 
     # Assume `load_data` is a function that reads a text file and processes it into the required format
     # train_dataset = [tokenizer(text) for text in train_data]
