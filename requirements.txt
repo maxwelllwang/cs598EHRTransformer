@@ -3,3 +3,5 @@ tqdm==4.62.2
 transformers==4.16.2
 numpy
 scikit-learn
+pandas
+pytorch-pretrained-bert
